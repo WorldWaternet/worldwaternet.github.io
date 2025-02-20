@@ -32,6 +32,7 @@
     
     const map = L.map("map", mapOptions);
     
+    // إضافة طبقة GeoMolg عبر WMS
     L.tileLayer.wms("https://orthophotos.geomolg.ps/adaptor/rest/services/Orthophotos_WB_2022_15cm_tif_PG1923_05/MapServer/WMSServer", {
       layers: "0",
       format: "image/png",
@@ -39,10 +40,12 @@
       attribution: "© GeoMolg"
     }).addTo(map);
 
+    // تحميل بيانات المناطق الجغرافية
     $.getJSON("RamallahZones.json", function(RZ) {
       L.geoJson(RZ).addTo(map);
     });
 
+    // تحميل بيانات حاويات النفايات
     $.getJSON("wasteContainer.json", function(WC) {
       L.geoJson(WC).addTo(map);
     });
