@@ -1,54 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>World Waternet projects in Palestine</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+  <meta charset="utf-8">
+  <title>Google Satellite Map</title>
   <style>
-    body {
-      margin: 0px;
+    body, html {
       height: 100%;
-      width: 100%;
+      margin: 0;
+      padding: 0;
     }
     #map {
-      position: absolute;
+      height: 100%;
       width: 100%;
-      top: 0px;
-      bottom: 0;
     }
   </style>
 </head>
 <body>
   <div id="map"></div>
-  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
+
   <script>
-    const mapOptions = {
-      zoomSnap: 0.5,
-      center: [31.9045, 35.2045],
-      zoom: 17.5,
-    };
-    
-    const map = L.map("map", mapOptions);
-    
-    // إضافة طبقة GeoMolg عبر WMS
-    L.tileLayer.wms("https://orthophotos.geomolg.ps/adaptor/rest/services/Orthophotos_WB_2022_15cm_tif_PG1923_05/MapServer/WMSServer", {
-      layers: "0",
-      format: "image/png",
-      transparent: true,
-      attribution: "© GeoMolg"
-    }).addTo(map);
-
-    // تحميل بيانات المناطق الجغرافية
-    $.getJSON("RamallahZones.json", function(RZ) {
-      L.geoJson(RZ).addTo(map);
-    });
-
-    // تحميل بيانات حاويات النفايات
-    $.getJSON("wasteContainer.json", function(WC) {
-      L.geoJson(WC).addTo(map);
-    });
+    function initMap() {
+      var map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 31.9045, lng: 35.2045 }, // إحداثيات المركز (رام الله)
+        zoom: 10, // مستوى التكبير
+        mapTypeId: "satellite" // تعيين نوع الخريطة إلى القمر الصناعي
+      });
+    }
   </script>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
 </body>
 </html>
