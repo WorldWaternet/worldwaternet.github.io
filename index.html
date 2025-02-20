@@ -1,50 +1,90 @@
-كود باالصورة القمر الصناعي 
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>World Waternet projects in Palestine</title>
+  <title>Salfit Water Network</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
   <style>
     body {
-      margin: 0px;
+      margin: 0;
       height: 100%;
       width: 100%;
     }
     #map {
       position: absolute;
       width: 100%;
-      top: 0px;
-      bottom: 0;
+      height: 100%;
     }
   </style>
 </head>
+
 <body>
   <div id="map"></div>
+
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
   <script>
     const mapOptions = {
-      zoomSnap: 0.5,
-      center: [31.916092065118747, 35.20589378647363],
-      zoom: 17.5,
+      center: [32.082203, 35.182099],  
+      zoom: 14,  
+      zoomSnap: 0.5    
     };
-    
+
     const map = L.map("map", mapOptions);
-    
-    L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-      subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-      maxZoom: 20,
-      attribution: 'Map data &copy; <a href="https://www.google.com/maps">Google Maps</a>'
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 20
     }).addTo(map);
 
-    $.getJSON("RamallahZones.json", function(RZ) {
-      L.geoJson(RZ).addTo(map);
-    });
+    function addGeoJsonData(url, styleOptions, popupFields, isPointLayer = false, imageUrl = null) {
+      $.getJSON(url, function (data) {
+        L.geoJson(data, {
+          pointToLayer: function (feature, latlng) {
+            if (isPointLayer) {
+              return L.circleMarker(latlng, {
+                radius: 5,  
+                fillColor: "blue",
+                color: "blue",
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.8
+              });
+            } else {
+              return L.polyline(feature.geometry.coordinates.map(coord => [coord[1], coord[0]]), styleOptions);
+            }
+          },
+          style: !isPointLayer ? styleOptions : null,
+          onEachFeature: function (feature, layer) {
+            let popupContent = "";
 
-    $.getJSON("wasteContainer.json", function(WC) {
-      L.geoJson(WC).addTo(map);
-    });
+            if (imageUrl) {
+              popupContent += `<img src="${imageUrl}" alt="Image" width="50" height="50" style="border-radius: 10px; float: left; margin-right: 10px;">`;
+            }
+
+            popupFields.forEach(field => {
+              if (feature.properties[field]) {
+                popupContent += `<b>${field}:</b> ${feature.properties[field]}<br>`;
+              }
+            });
+
+            layer.bindPopup(popupContent);
+          }
+        }).addTo(map);
+      });
+    }
+
+    addGeoJsonData("SlF.json", { color: "black", weight: 2, fillOpacity: 0 }, ["Community_"], false, "https://upload.wikimedia.org/wikipedia/commons/9/97/Salfit_6-2018.jpg");
+    addGeoJsonData("IskA.json", { color: "red", weight: 2, fillOpacity: 0 }, ["Community_"], false, "https://palqura.com/images/village/Iskaka-48619.jpg");
+    addGeoJsonData("kiS.json", { color: "brown", weight: 2, fillOpacity: 0 }, ["Community_"], false, "https://palqura.com/images/village/photo_2024-01-15_07-49-41.jpg");
+    addGeoJsonData("HouseConnection.json", { color: "Navy", weight: 2, dashArray: "5, 5" }, ["NetworkType", "Material", "Diameter", "layout year"]);
+    addGeoJsonData("DistributionPipe1.json", { color: "red", weight: 1 }, ["NetworkType", "Material", "Diameter", "layout year"]);
+    addGeoJsonData("DistributionPipe2.json", { color: "blue", weight: 2 }, ["NetworkType", "Material", "Diameter", "layout year"]);
+    addGeoJsonData("DistributionPipe6.json", { color: "black", weight: 2 }, ["NetworkType", "Material", "Diameter", "layout year"]);
+    addGeoJsonData("DistributionPipe3.json", { color: "green", weight: 3 }, ["NetworkType", "Material", "Diameter", "layout year"]);
+    addGeoJsonData("MeterS.json", {}, ["Name", "Service_Nu", "connection", "location"], true);
+
   </script>
 </body>
 </html>
