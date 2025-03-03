@@ -20,24 +20,33 @@
     }
     .control-buttons {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
       z-index: 1000;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 10px;
+      box-sizing: border-box;
     }
     .control-buttons button {
-      display: block;
-      margin: 5px;
       padding: 10px;
       font-size: 16px;
       cursor: pointer;
+    }
+    .control-buttons #left-button {
+      margin-left: 10px;
+    }
+    .control-buttons #right-button {
+      margin-right: 10px;
     }
   </style>
 </head>
 <body>
   <div id="map"></div>
   <div class="control-buttons">
-    <button id="left-button">◀ Left</button>
-    <button id="right-button">Right ▶</button>
+    <button id="left-button">◀</button>
+    <button id="right-button">▶</button>
   </div>
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -54,9 +63,7 @@
       metric: true,
       imperial: false
     }).addTo(map);
-
     const markers = L.markerClusterGroup();
-
     $.getJSON("GoverW.json", function(GW) {
       let goverLayer = L.geoJson(GW, {
         style: function(feature) {
@@ -76,7 +83,6 @@
       }).addTo(map);
       map.fitBounds(goverLayer.getBounds());
     });
-
     $.getJSON("LocationSalfit.json", function(LS) {
       const blueIcon = L.icon({
         iconUrl: 'blue.png',
@@ -93,7 +99,6 @@
     });
     
     map.addLayer(markers);
-
     document.getElementById('left-button').addEventListener('click', function() {
       map.panBy([-100, 0]);
     });
