@@ -38,11 +38,26 @@
     }).addTo(map);
 
     $.getJSON("GoverW.json", function(GW) {
-      L.geoJson(GW).addTo(map);
+      L.geoJson(GW, {
+        style: function (feature) {
+          return { color: "black" };
+        }
+      }).addTo(map);
     });
 
     $.getJSON("LocationSalfit.json", function(LS) {
-      L.geoJson(LS).addTo(map);
+      const blueIcon = L.icon({
+        iconUrl: 'blue.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+      });
+      
+      L.geoJson(LS, {
+        pointToLayer: function(feature, latlng) {
+          return L.marker(latlng, { icon: blueIcon });
+        }
+      }).addTo(map);
     });
   </script>
 </body>
