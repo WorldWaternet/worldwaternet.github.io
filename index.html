@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
   <style>
     body {
       margin: 0px;
@@ -19,14 +18,30 @@
       top: 0px;
       bottom: 0;
     }
+    .control-buttons {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+    }
+    .control-buttons button {
+      display: block;
+      margin: 5px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
+  <div class="control-buttons">
+    <button id="left-button">◀ Left</button>
+    <button id="right-button">Right ▶</button>
+  </div>
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-  <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
   <script>
     const map = L.map("map");
     
@@ -79,32 +94,13 @@
     
     map.addLayer(markers);
 
-    L.control.locate({
-      position: 'topleft',
-      drawCircle: false,
-      follow: true,
-      setView: true,
-      keepCurrentZoomLevel: false,
-      markerStyle: {
-        weight: 1,
-        opacity: 0.8,
-        fillOpacity: 0.8
-      },
-      icon: 'fa fa-location-arrow',
-      metric: true,
-      strings: {
-        title: "Show location ",
-        popup: "You are within {distance} {unit} from this point",
-        outsideMapBoundsMsg: "You seem located outside the boundaries of the map"
-      },
-      locateOptions: {
-        maxZoom: 15,
-        initialZoomLevel: 15,
-        enableHighAccuracy: true,
-        maximumAge: 10000,
-        timeout: 10000
-      }
-    }).addTo(map);
+    document.getElementById('left-button').addEventListener('click', function() {
+      map.panBy([-100, 0]);
+    });
+    
+    document.getElementById('right-button').addEventListener('click', function() {
+      map.panBy([100, 0]);
+    });
   </script>
 </body>
 </html>
