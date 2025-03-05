@@ -36,12 +36,6 @@
       outline: none;
       border-radius: 5px;
     }
-    .control-buttons #left-button {
-      margin-left: 10px;
-    }
-    .control-buttons #right-button {
-      margin-right: 10px;
-    }
   </style>
 </head>
 <body>
@@ -53,18 +47,13 @@
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script>
-    const map = L.map("map");
-    
+    const map = L.map("map").setView([32.0, 35.2], 8); // تحديد الموقع الافتراضي
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Tiles &copy; Esri'
     }).addTo(map);
-    
-    L.control.scale({
-      position: 'bottomright',
-      metric: true,
-      imperial: false
-    }).addTo(map);
-    
+
+    L.control.scale({ position: 'bottomright', metric: true, imperial: false }).addTo(map);
+
     $.getJSON("GoverW.json", function(GW) {
       let goverLayer = L.geoJson(GW, {
         style: function(feature) {
@@ -84,30 +73,47 @@
       }).addTo(map);
       map.fitBounds(goverLayer.getBounds());
     });
-    
-    $.getJSON("SalfitProjects.json", function(SP) {
-      const blueIcon = L.icon({
-        iconUrl: 'blue.png',
-        iconSize: [30, 48], 
-        iconAnchor: [15, 48],
-        popupAnchor: [1, -34],
+
+    let projectLayer; // متغير لتخزين الطبقة
+
+    function getIconSize(zoom) {
+      let size = Math.max(10, zoom * 3); // التحكم في حجم الأيقونة بناءً على مستوى التكبير
+      return [size, size * 1.6]; // التحكم في نسبة الطول والعرض
+    }
+
+    function updateProjectIcons() {
+      if (projectLayer) {
+        map.removeLayer(projectLayer);
+      }
+
+      $.getJSON("SalfitProjects.json", function(SP) {
+        projectLayer = L.geoJson(SP, {
+          pointToLayer: function(feature, latlng) {
+            let zoom = map.getZoom();
+            let size = getIconSize(zoom);
+            let dynamicIcon = L.icon({
+              iconUrl: 'blue.png',
+              iconSize: size,
+              iconAnchor: [size[0] / 2, size[1]], 
+              popupAnchor: [0, -size[1] / 2]
+            });
+            return L.marker(latlng, { icon: dynamicIcon });
+          }
+        }).addTo(map);
       });
-      
-      L.geoJson(SP, {
-        pointToLayer: function(feature, latlng) {
-          return L.marker(latlng, { icon: blueIcon });
-        }
-      }).addTo(map); 
-    });
-    
+    }
+
+    updateProjectIcons(); // 
+    map.on("zoomend", updateProjectIcons); // 
+
     function panLeft() {
       map.panBy([-100, 0]);
     }
-    
+
     function panRight() {
       map.panBy([100, 0]);
     }
-    
+
     document.getElementById('left-button').addEventListener('click', panLeft);
     document.getElementById('right-button').addEventListener('click', panRight);
   </script>
