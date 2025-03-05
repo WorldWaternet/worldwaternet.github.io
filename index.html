@@ -36,6 +36,18 @@
       outline: none;
       border-radius: 5px;
     }
+    .control-buttons #left-button {
+      margin-left: 10px;
+    }
+    .control-buttons #right-button {
+      margin-right: 10px;
+    }
+    .marker-icon {
+      background-image: url('blue.png');
+      background-size: cover;
+      display: block;
+      border-radius: 50%;
+    }
   </style>
 </head>
 <body>
@@ -44,16 +56,24 @@
     <button id="left-button">◄</button>
     <button id="right-button">►</button>
   </div>
+  
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script>
-    const map = L.map("map").setView([32.0, 35.2], 8); // تحديد الموقع الافتراضي
+    const map = L.map("map").setView([32.0, 35.2], 10); // تحديد مركز فلسطين وزوم افتراضي
+
+    // إضافة خريطة القمر الصناعي
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Tiles &copy; Esri'
     }).addTo(map);
 
-    L.control.scale({ position: 'bottomright', metric: true, imperial: false }).addTo(map);
+    L.control.scale({
+      position: 'bottomright',
+      metric: true,
+      imperial: false
+    }).addTo(map);
 
+    // تحميل ملف GeoJSON للمحافظات
     $.getJSON("GoverW.json", function(GW) {
       let goverLayer = L.geoJson(GW, {
         style: function(feature) {
@@ -74,38 +94,47 @@
       map.fitBounds(goverLayer.getBounds());
     });
 
-    let projectLayer; // متغير لتخزين الطبقة
+    let projectMarkers = [];
 
-    function getIconSize(zoom) {
-      let size = Math.max(10, zoom * 3); // التحكم في حجم الأيقونة بناءً على مستوى التكبير
-      return [size, size * 1.6]; // التحكم في نسبة الطول والعرض
-    }
-
-    function updateProjectIcons() {
-      if (projectLayer) {
-        map.removeLayer(projectLayer);
+    // تحميل مشاريع سلفيت
+    $.getJSON("SalfitProjects.json", function(SP) {
+      function getIconSize(zoom) {
+        let size = Math.max(15, zoom * 3); // حساب الحجم بناءً على مستوى التكبير
+        return [size, size]; 
       }
 
-      $.getJSON("SalfitProjects.json", function(SP) {
-        projectLayer = L.geoJson(SP, {
-          pointToLayer: function(feature, latlng) {
-            let zoom = map.getZoom();
-            let size = getIconSize(zoom);
-            let dynamicIcon = L.icon({
-              iconUrl: 'blue.png',
-              iconSize: size,
-              iconAnchor: [size[0] / 2, size[1]], 
-              popupAnchor: [0, -size[1] / 2]
-            });
-            return L.marker(latlng, { icon: dynamicIcon });
-          }
-        }).addTo(map);
+      function createProjectMarker(feature, latlng) {
+        let size = getIconSize(map.getZoom());
+        return L.marker(latlng, {
+          icon: L.divIcon({
+            className: 'marker-icon',
+            iconSize: size
+          })
+        });
+      }
+
+      let projectLayer = L.geoJson(SP, {
+        pointToLayer: createProjectMarker
+      }).addTo(map);
+
+      projectMarkers.push(projectLayer);
+    });
+
+    // تحديث حجم الأيقونات عند تغيير الزوم
+    map.on('zoomend', function() {
+      let zoom = map.getZoom();
+      projectMarkers.forEach(layer => {
+        layer.eachLayer(marker => {
+          let newSize = getIconSize(zoom);
+          marker.setIcon(L.divIcon({
+            className: 'marker-icon',
+            iconSize: newSize
+          }));
+        });
       });
-    }
+    });
 
-    updateProjectIcons(); // 
-    map.on("zoomend", updateProjectIcons); // 
-
+    // التحكم في تحريك الخريطة
     function panLeft() {
       map.panBy([-100, 0]);
     }
