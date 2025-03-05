@@ -42,24 +42,6 @@
     .control-buttons #right-button {
       margin-right: 10px;
     }
-    .content-container {
-      text-align: center;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-    }
-    .content-container img {
-      max-width: 80%;
-      height: auto;
-      border-radius: 10px;
-    }
-    .content-container h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-    }
-    .content-container p {
-      font-size: 1.2rem;
-      line-height: 1.6;
-    }
   </style>
 </head>
 <body>
@@ -106,43 +88,16 @@
     $.getJSON("SalfitProjects.json", function(SP) {
       const blueIcon = L.icon({
         iconUrl: 'blue.png',
-        iconSize: [30, 48],
+        iconSize: [30, 48], 
         iconAnchor: [15, 48],
         popupAnchor: [1, -34],
       });
-
+      
       L.geoJson(SP, {
         pointToLayer: function(feature, latlng) {
           return L.marker(latlng, { icon: blueIcon });
-        },
-        onEachFeature: function(feature, layer) {
-          layer.on('click', function(e) {
-            // تحقق من أن المشروع هو BluElephant
-            if (feature.properties.Name === "BluElephant") {
-              // فتح صفحة جديدة تحتوي على صورة ونص عند الضغط على BluElephant
-              const name = feature.properties.Name;
-              const description = "BluElephant is a compact Smart MBR system designed for decentralized municipal wastewater treatment. It serves 50–150 people/day (5–6 m³/day) with effluent suitable for irrigation. Featuring a small footprint, easy transport, plug-and-play setup, and minimal energy consumption, it offers a sustainable and efficient solution for wastewater management.";
-              const imageUrl = "BluElephant.png"; // اسم الصورة
-
-              // فتح صفحة جديدة لعرض الصورة والنص
-              const content = `
-                <html>
-                  <head><title>${name}</title></head>
-                  <body>
-                    <div class="content-container">
-                      <h1>${name}</h1>
-                      <img src="${imageUrl}" alt="${name}" />
-                      <p>${description}</p>
-                    </div>
-                  </body>
-                </html>
-              `;
-              const newWindow = window.open();
-              newWindow.document.write(content);
-            }
-          });
         }
-      }).addTo(map);
+      }).addTo(map); 
     });
     
     function panLeft() {
@@ -157,4 +112,4 @@
     document.getElementById('right-button').addEventListener('click', panRight);
   </script>
 </body>
-</html>
+</html>  
