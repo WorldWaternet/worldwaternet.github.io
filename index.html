@@ -95,7 +95,17 @@
       
       L.geoJson(SP, {
         pointToLayer: function(feature, latlng) {
-          return L.marker(latlng, { icon: blueIcon });
+          let marker = L.marker(latlng, { icon: blueIcon });
+
+          // تحقق من أن المشروع هو BluElephant
+          let popupContent = `<b>${feature.properties.Name}</b>`;
+
+          if (feature.properties.Name === "BluElephant") {
+            popupContent += `<br><img src="ble.jpg" width="200px" style="display: block; margin-top: 5px;">`;
+          }
+
+          marker.bindPopup(popupContent);
+          return marker;
         }
       }).addTo(map); 
     });
@@ -112,4 +122,4 @@
     document.getElementById('right-button').addEventListener('click', panRight);
   </script>
 </body>
-</html> 
+</html>
