@@ -100,8 +100,9 @@
           // تحقق من أن المشروع هو BluElephant
           let popupContent = `<b>${feature.properties.Name}</b>`;
 
+          // إذا كان اسم المشروع هو BluElephant، سيتم عرض الصورة ble.jpg بحجم أكبر
           if (feature.properties.Name === "BluElephant") {
-            popupContent += `<br><img src="ble.jpg" width="200px" style="display: block; margin-top: 5px;">`;
+            popupContent += `<br><img src="ble.jpg" width="400px" style="display: block; margin-top: 5px;">`;
           }
 
           marker.bindPopup(popupContent);
