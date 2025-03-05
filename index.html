@@ -42,6 +42,14 @@
     .control-buttons #right-button {
       margin-right: 10px;
     }
+    /* إضافات لتنسيق الصورة في النافذة المنبثقة */
+    .popup-content img {
+      width: 100%;
+      max-width: 600px; /* يمكنك تعديل الحجم هنا حسب الحجم المطلوب */
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
   </style>
 </head>
 <body>
@@ -102,7 +110,9 @@
 
           // إذا كان اسم المشروع هو BluElephant، سيتم عرض الصورة ble.jpg بحجم أكبر
           if (feature.properties.Name === "BluElephant") {
-            popupContent += `<br><img src="ble.jpg" width="400px" style="display: block; margin-top: 5px;">`;
+            popupContent += `<div class="popup-content">
+                                <img src="ble.jpg" alt="BluElephant Image">
+                              </div>`;
           }
 
           marker.bindPopup(popupContent);
