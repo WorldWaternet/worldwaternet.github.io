@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <title>World Waternet projects in Palestine</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" />
   <style>
     body {
       margin: 0px;
@@ -42,12 +44,6 @@
     .control-buttons #right-button {
       margin-right: 10px;
     }
-    .marker-icon {
-      background-image: url('blue.png');
-      background-size: cover;
-      display: block;
-      border-radius: 50%;
-    }
   </style>
 </head>
 <body>
@@ -59,10 +55,10 @@
   
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
   <script>
-    const map = L.map("map").setView([32.0, 35.2], 10); // تحديد مركز فلسطين وزوم افتراضي
+    const map = L.map("map").setView([32.0, 35.2], 10); // ضبط المركز الافتراضي
 
-    // إضافة خريطة القمر الصناعي
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Tiles &copy; Esri'
     }).addTo(map);
@@ -73,7 +69,6 @@
       imperial: false
     }).addTo(map);
 
-    // تحميل ملف GeoJSON للمحافظات
     $.getJSON("GoverW.json", function(GW) {
       let goverLayer = L.geoJson(GW, {
         style: function(feature) {
@@ -94,47 +89,28 @@
       map.fitBounds(goverLayer.getBounds());
     });
 
-    let projectMarkers = [];
+    // إنشاء مجموعة التجميع لتقليل تداخل الأيقونات
+    let markersCluster = L.markerClusterGroup({
+      maxClusterRadius: 30 // تقليل التداخل بين العلامات
+    });
 
-    // تحميل مشاريع سلفيت
     $.getJSON("SalfitProjects.json", function(SP) {
-      function getIconSize(zoom) {
-        let size = Math.max(15, zoom * 3); // حساب الحجم بناءً على مستوى التكبير
-        return [size, size]; 
-      }
-
-      function createProjectMarker(feature, latlng) {
-        let size = getIconSize(map.getZoom());
-        return L.marker(latlng, {
-          icon: L.divIcon({
-            className: 'marker-icon',
-            iconSize: size
-          })
-        });
-      }
-
-      let projectLayer = L.geoJson(SP, {
-        pointToLayer: createProjectMarker
-      }).addTo(map);
-
-      projectMarkers.push(projectLayer);
-    });
-
-    // تحديث حجم الأيقونات عند تغيير الزوم
-    map.on('zoomend', function() {
-      let zoom = map.getZoom();
-      projectMarkers.forEach(layer => {
-        layer.eachLayer(marker => {
-          let newSize = getIconSize(zoom);
-          marker.setIcon(L.divIcon({
-            className: 'marker-icon',
-            iconSize: newSize
-          }));
-        });
+      const smallIcon = L.icon({
+        iconUrl: 'blue.png',
+        iconSize: [20, 32], // أيقونة أصغر
+        iconAnchor: [10, 32], // تعديل الموضع
+        popupAnchor: [0, -30],
       });
+
+      L.geoJson(SP, {
+        pointToLayer: function(feature, latlng) {
+          return L.marker(latlng, { icon: smallIcon });
+        }
+      }).addTo(markersCluster); 
+
+      map.addLayer(markersCluster);
     });
 
-    // التحكم في تحريك الخريطة
     function panLeft() {
       map.panBy([-100, 0]);
     }
