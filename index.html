@@ -42,6 +42,48 @@
     .control-buttons #right-button {
       margin-right: 10px;
     }
+
+    /* نافذة المعلومات على الجنب الأيسر */
+    .info-box {
+      position: absolute;
+      top: 10%;
+      left: 0;
+      width: 300px;
+      height: 80%;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+      overflow-y: auto;
+      display: none;
+      z-index: 1001;
+    }
+    .info-box h3 {
+      font-size: 20px;
+      color: #007BFF;
+      margin-bottom: 10px;
+    }
+    .info-box img {
+      width: 100%;
+      max-width: 250px;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .info-box p {
+      font-size: 16px;
+      color: #333;
+    }
+    .info-box .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      background-color: transparent;
+      border: none;
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -49,6 +91,14 @@
   <div class="control-buttons">
     <button id="left-button">◄</button>
     <button id="right-button">►</button>
+  </div>
+  
+  <!-- نافذة المعلومات -->
+  <div class="info-box" id="info-box">
+    <button class="close-btn" id="close-btn">×</button>
+    <h3 id="info-title"></h3>
+    <img id="info-img" src="" alt="Info Image">
+    <p id="info-text"></p>
   </div>
   
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
@@ -114,30 +164,18 @@
           const name = feature.properties.Name;
           const details = siteDetails[name] || { img: "default.jpg", text: "موقع غير محدد التفاصيل." };
 
-          // كود النافذة المنبثقة مع تحسين الحجم والتنسيق
-          const popupContent = `
-            <div style="
-              max-width: 400px;
-              text-align: center;
-              padding: 20px;
-              font-family: Arial, sans-serif;
-              font-size: 18px;
-              color: #333;
-              line-height: 1.6;
-              box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-              border-radius: 10px;
-              background: #fff;">
-              
-              <h3 style="font-size: 24px; color: #007BFF; margin-bottom: 15px;">${name}</h3>
-              
-              <img src="${details.img}" alt="${name}" 
-                style="width: 100%; max-width: 350px; height: auto; border-radius: 10px; margin-bottom: 10px;">
-              
-              <p style="font-size: 18px; font-weight: bold;">${details.text}</p>
-            </div>
-          `;
+          // إضافة نافذة المعلومات عند الضغط على الموقع
+          const marker = L.marker(latlng, { icon: blueIcon }).addTo(map);
 
-          return L.marker(latlng, { icon: blueIcon }).bindPopup(popupContent);
+          marker.on('click', function() {
+            // تحديث المحتوى في نافذة المعلومات
+            document.getElementById('info-title').innerText = name;
+            document.getElementById('info-img').src = details.img;
+            document.getElementById('info-text').innerText = details.text;
+
+            // إظهار نافذة المعلومات
+            document.getElementById('info-box').style.display = 'block';
+          });
         }
       }).addTo(map);
     });
@@ -154,6 +192,11 @@
     // ربط الأزرار بوظائف التحريك
     document.getElementById('left-button').addEventListener('click', panLeft);
     document.getElementById('right-button').addEventListener('click', panRight);
+
+    // إغلاق نافذة المعلومات عند الضغط على زر الإغلاق
+    document.getElementById('close-btn').addEventListener('click', function() {
+      document.getElementById('info-box').style.display = 'none';
+    });
   </script>
 </body>
 </html>
