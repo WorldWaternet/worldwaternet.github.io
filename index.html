@@ -28,14 +28,19 @@
       box-sizing: border-box;
     }
     .control-buttons button {
-      padding: 10px 15px;
+      padding: 5px 10px;
       font-size: 20px;
       cursor: pointer;
       background-color: white;
       border: none;
       outline: none;
       border-radius: 5px;
-      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    }
+    .control-buttons #left-button {
+      margin-left: 10px;
+    }
+    .control-buttons #right-button {
+      margin-right: 10px;
     }
   </style>
 </head>
@@ -50,17 +55,45 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script>
     // إنشاء الخريطة
-    const map = L.map("map").setView([32.08, 35.18], 13);
+    const map = L.map("map");
 
     // إضافة طبقة الخريطة الأساسية
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Tiles &copy; Esri'
     }).addTo(map);
 
+    // إضافة مقياس للخريطة
+    L.control.scale({
+      position: 'bottomright',
+      metric: true,
+      imperial: false
+    }).addTo(map);
+
+    // تحميل بيانات المحافظات ورسمها على الخريطة
+    $.getJSON("GoverW.json", function(GW) {
+      let goverLayer = L.geoJson(GW, {
+        style: function(feature) {
+          return {
+            fillColor: "",
+            fillOpacity: 0.0,
+            color: "black",
+            weight: 2,
+            opacity: 0.7
+          };
+        },
+        onEachFeature: function(feature, layer) {
+          layer.on('click', function(e) {
+            alert("Governorate: " + feature.properties.Name);
+          });
+        }
+      }).addTo(map);
+      map.fitBounds(goverLayer.getBounds());
+    });
+
     // تحميل بيانات المشاريع ورسمها على الخريطة
     $.getJSON("SalfitProjects.json", function(SP) {
       const blueIcon = L.icon({
-        iconUrl: 'blue.png', // تأكد من وجود هذا الملف بجانب ملف HTML
+        iconUrl: 'blue.png',
         iconSize: [30, 48], 
         iconAnchor: [15, 48],
         popupAnchor: [1, -34],
@@ -68,12 +101,12 @@
 
       // خريطة الصور والنصوص لكل موقع
       const siteDetails = {
-        "BluElephant": { img: "BluElephant.png", text: "BluElephant is a compact Smart MBR system designed for decentralized municipal wastewater treatment." },
-        "Salfeet Municipality": { img: "salfeet_municipality.jpg", text: "البلدية المركزية لمدينة سلفيت." },
-        "Iskaka village council": { img: "iskaka.jpg", text: "مجلس قرية إسكاكا لدعم مشاريع البنية التحتية." },
-        "Farkha village council": { img: "farkha.jpg", text: "مجلس قرية فرخة لتحسين جودة المياه." },
-        "Flowless": { img: "flowless.jpg", text: "مشروع Flowless لمراقبة تسرب المياه." },
-        "Purification station": { img: "purification.jpg", text: "محطة معالجة مياه الصرف في سلفيت." }
+        "BluElephant": { img: "BluElephant.png", text: "BluElephant هو نظام MBR ذكي لمعالجة مياه الصرف الصحي بطريقة مستدامة." },
+        "Salfeet Municipality": { img: "salfeet_municipality.jpg", text: "البلدية المركزية لمدينة سلفيت، تعمل على تحسين خدمات المياه والبنية التحتية." },
+        "Iskaka village council": { img: "iskaka.jpg", text: "مجلس قرية إسكاكا مسؤول عن تطوير مشاريع المياه والبيئة." },
+        "Farkha village council": { img: "farkha.jpg", text: "مجلس قرية فرخة يركز على جودة المياه وتحسين الصرف الصحي." },
+        "Flowless": { img: "flowless.jpg", text: "مشروع Flowless يهدف إلى مراقبة التسربات وتحسين كفاءة الشبكة." },
+        "Purification station": { img: "purification.jpg", text: "محطة معالجة مياه الصرف الصحي في سلفيت، تدعم إعادة استخدام المياه." }
       };
 
       L.geoJson(SP, {
@@ -81,12 +114,12 @@
           const name = feature.properties.Name;
           const details = siteDetails[name] || { img: "default.jpg", text: "موقع غير محدد التفاصيل." };
 
-          // كود النافذة المنبثقة مع تعديلات الحجم والتنسيق
+          // كود النافذة المنبثقة مع تحسين الحجم والتنسيق
           const popupContent = `
             <div style="
-              max-width: 350px;
+              max-width: 400px;
               text-align: center;
-              padding: 15px;
+              padding: 20px;
               font-family: Arial, sans-serif;
               font-size: 18px;
               color: #333;
@@ -95,12 +128,12 @@
               border-radius: 10px;
               background: #fff;">
               
-              <h3 style="font-size: 22px; color: #007BFF; margin-bottom: 10px;">${name}</h3>
+              <h3 style="font-size: 24px; color: #007BFF; margin-bottom: 15px;">${name}</h3>
               
               <img src="${details.img}" alt="${name}" 
-                style="width: 100%; max-width: 300px; height: auto; border-radius: 10px; margin-bottom: 10px;">
+                style="width: 100%; max-width: 350px; height: auto; border-radius: 10px; margin-bottom: 10px;">
               
-              <p style="font-size: 16px; font-weight: bold;">${details.text}</p>
+              <p style="font-size: 18px; font-weight: bold;">${details.text}</p>
             </div>
           `;
 
@@ -111,11 +144,11 @@
 
     // دوال تحريك الخريطة
     function panLeft() {
-      map.panBy([-100, 0]);
+      map.panBy([-150, 0]);
     }
 
     function panRight() {
-      map.panBy([100, 0]);
+      map.panBy([150, 0]);
     }
 
     // ربط الأزرار بوظائف التحريك
