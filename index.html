@@ -53,18 +53,22 @@
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script>
+    // إنشاء الخريطة
     const map = L.map("map");
-    
+
+    // إضافة طبقة الخريطة الأساسية
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Tiles &copy; Esri'
     }).addTo(map);
-    
+
+    // إضافة مقياس للخريطة
     L.control.scale({
       position: 'bottomright',
       metric: true,
       imperial: false
     }).addTo(map);
-    
+
+    // تحميل بيانات المحافظات ورسمها على الخريطة
     $.getJSON("GoverW.json", function(GW) {
       let goverLayer = L.geoJson(GW, {
         style: function(feature) {
@@ -84,32 +88,56 @@
       }).addTo(map);
       map.fitBounds(goverLayer.getBounds());
     });
-    
+
+    // تحميل بيانات المشاريع ورسمها على الخريطة
     $.getJSON("SalfitProjects.json", function(SP) {
       const blueIcon = L.icon({
-        iconUrl: 'blue.png',
+        iconUrl: 'blue.png', // تأكد من وجود هذا الملف
         iconSize: [30, 48], 
         iconAnchor: [15, 48],
         popupAnchor: [1, -34],
       });
-      
+
+      // خريطة الصور والنصوص لكل موقع
+      const siteDetails = {
+        "BluElephant": { img: "images/bluelephant.jpg", text: "نظام MBR ذكي لمعالجة مياه الصرف الصحي." },
+        "Salfeet Municipality": { img: "images/salfeet_municipality.jpg", text: "البلدية المركزية لمدينة سلفيت." },
+        "Iskaka village council": { img: "images/iskaka.jpg", text: "مجلس قرية إسكاكا لدعم مشاريع البنية التحتية." },
+        "Farkha village council": { img: "images/farkha.jpg", text: "مجلس قرية فرخة لتحسين جودة المياه." },
+        "Flowless": { img: "images/flowless.jpg", text: "مشروع Flowless لمراقبة تسرب المياه." },
+        "Purification station": { img: "images/purification.jpg", text: "محطة معالجة مياه الصرف في سلفيت." }
+      };
+
       L.geoJson(SP, {
         pointToLayer: function(feature, latlng) {
-          return L.marker(latlng, { icon: blueIcon });
+          const name = feature.properties.Name;
+          const details = siteDetails[name] || { img: "images/default.jpg", text: "موقع غير محدد التفاصيل." };
+          
+          const popupContent = `
+            <div style="text-align:center;">
+              <h3>${name}</h3>
+              <img src="${details.img}" alt="${name}" style="width:200px; border-radius:10px;">
+              <p>${details.text}</p>
+            </div>
+          `;
+
+          return L.marker(latlng, { icon: blueIcon }).bindPopup(popupContent);
         }
-      }).addTo(map); 
+      }).addTo(map);
     });
-    
+
+    // دوال تحريك الخريطة
     function panLeft() {
       map.panBy([-100, 0]);
     }
-    
+
     function panRight() {
       map.panBy([100, 0]);
     }
-    
+
+    // ربط الأزرار بوظائف التحريك
     document.getElementById('left-button').addEventListener('click', panLeft);
     document.getElementById('right-button').addEventListener('click', panRight);
   </script>
 </body>
-</html>  
+</html>
