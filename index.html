@@ -36,12 +36,6 @@
       outline: none;
       border-radius: 5px;
     }
-    .control-buttons #left-button {
-      margin-left: 10px;
-    }
-    .control-buttons #right-button {
-      margin-right: 10px;
-    }
   </style>
 </head>
 <body>
@@ -62,38 +56,10 @@
       attribution: 'Tiles &copy; Esri'
     }).addTo(map);
 
-    // إضافة مقياس للخريطة
-    L.control.scale({
-      position: 'bottomright',
-      metric: true,
-      imperial: false
-    }).addTo(map);
-
-    // تحميل بيانات المحافظات ورسمها على الخريطة
-    $.getJSON("GoverW.json", function(GW) {
-      let goverLayer = L.geoJson(GW, {
-        style: function(feature) {
-          return {
-            fillColor: "",
-            fillOpacity: 0.0,
-            color: "black",
-            weight: 2,
-            opacity: 0.7
-          };
-        },
-        onEachFeature: function(feature, layer) {
-          layer.on('click', function(e) {
-            alert("Governorate: " + feature.properties.Name);
-          });
-        }
-      }).addTo(map);
-      map.fitBounds(goverLayer.getBounds());
-    });
-
     // تحميل بيانات المشاريع ورسمها على الخريطة
     $.getJSON("SalfitProjects.json", function(SP) {
       const blueIcon = L.icon({
-        iconUrl: 'blue.png', // تأكد من وجود هذا الملف في نفس المجلد
+        iconUrl: 'blue.png', // تأكد من وجود هذا الملف بجانب ملف HTML
         iconSize: [30, 48], 
         iconAnchor: [15, 48],
         popupAnchor: [1, -34],
@@ -101,18 +67,18 @@
 
       // خريطة الصور والنصوص لكل موقع
       const siteDetails = {
-        "BluElephant": { img: "images/BluElephant.png", text: "BluElephant is a compact Smart MBR system designed for decentralized municipal wastewater treatment. It serves 50–150 people/day (5–6 m³/day) with effluent suitable for irrigation." },
-        "Salfeet Municipality": { img: "images/salfeet_municipality.jpg", text: "البلدية المركزية لمدينة سلفيت." },
-        "Iskaka village council": { img: "images/iskaka.jpg", text: "مجلس قرية إسكاكا لدعم مشاريع البنية التحتية." },
-        "Farkha village council": { img: "images/farkha.jpg", text: "مجلس قرية فرخة لتحسين جودة المياه." },
-        "Flowless": { img: "images/flowless.jpg", text: "مشروع Flowless لمراقبة تسرب المياه." },
-        "Purification station": { img: "images/purification.jpg", text: "محطة معالجة مياه الصرف في سلفيت." }
+        "BluElephant": { img: "BluElephant.png", text: "BluElephant is a compact Smart MBR system designed for decentralized municipal wastewater treatment." },
+        "Salfeet Municipality": { img: "salfeet_municipality.jpg", text: "البلدية المركزية لمدينة سلفيت." },
+        "Iskaka village council": { img: "iskaka.jpg", text: "مجلس قرية إسكاكا لدعم مشاريع البنية التحتية." },
+        "Farkha village council": { img: "farkha.jpg", text: "مجلس قرية فرخة لتحسين جودة المياه." },
+        "Flowless": { img: "flowless.jpg", text: "مشروع Flowless لمراقبة تسرب المياه." },
+        "Purification station": { img: "purification.jpg", text: "محطة معالجة مياه الصرف في سلفيت." }
       };
 
       L.geoJson(SP, {
         pointToLayer: function(feature, latlng) {
           const name = feature.properties.Name;
-          const details = siteDetails[name] || { img: "images/default.jpg", text: "موقع غير محدد التفاصيل." };
+          const details = siteDetails[name] || { img: "default.jpg", text: "موقع غير محدد التفاصيل." };
 
           // كود النافذة المنبثقة
           const popupContent = `
