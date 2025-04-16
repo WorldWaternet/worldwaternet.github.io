@@ -1,0 +1,4 @@
+{
+  "type" : "FeatureCollection",
+  "features" : [{"type":"Feature","id":1,"geometry":{"type":"Point","coordinates":[35.009363719151757,31.637148183125063]},"properties":{"OBJECTID":1,"Name":"Lab support","Location":"Hebron"}},{"type":"Feature","id":2,"geometry":{"type":"Point","coordinates":[35.093448953687691,31.58071012267985]},"properties":{"OBJECTID":2,"Name":"BluElephant","Location":"Hebron"}}]
+}
