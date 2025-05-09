@@ -16,7 +16,6 @@
       display: flex;
       justify-content: space-between;
       padding: 0 10px;
-      box-sizing: border-box;
     }
     .control-buttons button {
       padding: 5px 10px;
@@ -24,7 +23,6 @@
       cursor: pointer;
       background-color: white;
       border: none;
-      outline: none;
       border-radius: 5px;
     }
     .info-box {
@@ -41,11 +39,7 @@
       display: none;
       z-index: 1001;
     }
-    .info-box h3 {
-      font-size: 28px;
-      color: #007BFF;
-      margin-bottom: 15px;
-    }
+    .info-box h3 { font-size: 28px; color: #007BFF; margin-bottom: 15px; }
     .info-box img {
       width: 100%;
       max-width: 450px;
@@ -67,7 +61,6 @@
       background-color: transparent;
       border: none;
       color: #333;
-      z-index: 1002;
     }
   </style>
 </head>
@@ -94,33 +87,25 @@
       attribution: 'Tiles &copy; Esri'
     }).addTo(map);
 
-    L.control.scale({
-      position: 'bottomright',
-      metric: true,
-      imperial: false
-    }).addTo(map);
+    L.control.scale({ position: 'bottomright', metric: true, imperial: false }).addTo(map);
 
+    // خريطة المحافظات
     $.getJSON("GoverW.json", function(GW) {
-      let goverLayer = L.geoJson(GW, {
-        style: function(feature) {
-          return {
-            fillColor: "",
-            fillOpacity: 0.0,
-            color: "black",
-            weight: 2,
-            opacity: 0.7
-          };
-        },
+      const goverLayer = L.geoJson(GW, {
+        style: () => ({
+          fillOpacity: 0.0,
+          color: "black",
+          weight: 2,
+          opacity: 0.7
+        }),
         onEachFeature: function(feature, layer) {
-          layer.on('click', function(e) {
-            alert("Governorate: " + feature.properties.Name);
-          });
+          layer.on('click', () => alert("Governorate: " + feature.properties.Name));
         }
       }).addTo(map);
       map.fitBounds(goverLayer.getBounds());
     });
 
-    // عرض مشاريع سلفيت
+    // ===================== Salfit Projects =====================
     $.getJSON("SalfitProject.json", function(SP) {
       const blueIcon = L.icon({
         iconUrl: 'blue.png',
@@ -132,27 +117,27 @@
       const siteDetails = {
         "BluElephant": {
           img: "BluElephant.png",
-          text: "BluElephant is a compact Smart MBR system designed for decentralized municipal wastewater treatment. It serves 50–150 people/day (5–6 m³/day) with effluent suitable for irrigation. Featuring a small footprint, easy transport, plug-and-play setup, and minimal energy consumption, it offers a sustainable and efficient solution for wastewater management."
+          text: "BluElephant is a compact Smart MBR system designed for decentralized municipal wastewater treatment. It serves 50–150 people/day (5–6 m³/day)..."
         },
         "Salfeet Municipality": {
           img: "Gis.png",
-          text: "Geographic Information System (GIS) has been developed to enhance engineers' skills and expertise in handling GIS technologies. The system integrates household subscription data and asset management according to established standards, improving operational efficiency and data-driven decision-making."
+          text: "Geographic Information System (GIS) has been developed to enhance engineers' skills and expertise..."
         },
         "Data collection for Iskaka village": {
           img: "Iskaka.png",
-          text: "Collecting water network data for the village of Iskaka, including meters and water lines, using a surveying instrument involves a field survey with GPS, followed by data processing and analysis using GIS to create detailed maps and improve network management."
+          text: "Collecting water network data for the village of Iskaka..."
         },
         "Data collection for Farkha village": {
           img: "Farkha.png",
-          text: "Collecting water network data for the village of Farkha, including meters and water lines, using a surveying instrument involves a field survey with GPS, followed by data processing and analysis using GIS to create detailed maps and improve network management."
+          text: "Collecting water network data for the village of Farkha..."
         },
         "Flowless": {
           img: "flowless.jpg",
-          text: "Flowless contributes to water sustainability and enhances resource management efficiency by integrating advanced technologies for real-time water network monitoring, controlling, and data analysis. Its smart system relies on IoT devices to collect data on flow, pressure, and quality, enabling early detection of leaks and potential risks."
+          text: "Flowless contributes to water sustainability and enhances resource management efficiency..."
         },
         "Purification station - Lab support": {
           img: "Lab.jpeg",
-          text: "Lab support in Salfit Wastewater Treatment Plant includes all tests needed to operate and evaluate the WWTP at all treatment stages. The Dutch project's support involved enhancing the quality of lab procedures including sampling, testing, sample handling, troubleshooting, and interpreting results. Visits to quality control labs in Jordan (with Willi, Chanica, and Eddy) helped the team adopt standard methods for testing and quality development in wastewater laboratories."
+          text: "Lab support in Salfit WWTP includes all necessary testing and quality development practices..."
         }
       };
 
@@ -160,51 +145,77 @@
 
       L.geoJson(SP, {
         pointToLayer: function(feature, latlng) {
-          const rawName = feature.properties.Name;
-          const name = rawName.trim(); // إزالة الفراغات ونهاية السطر
-          const details = siteDetails[name] || { img: "default.jpg", text: "موقع غير محدد التفاصيل." };
+          const name = feature.properties.Name.trim();
+          const details = siteDetails[name] || { img: "default.jpg", text: "No details available." };
 
           let newLatLng = latlng;
           const offset = 0.0003;
-
           while (addedCoords.some(coord => newLatLng.distanceTo(coord) < 10)) {
             newLatLng = L.latLng(newLatLng.lat + offset, newLatLng.lng + offset);
           }
           addedCoords.push(newLatLng);
 
           const marker = L.marker(newLatLng, { icon: blueIcon }).bindPopup(name);
-
-          marker.on('click', function () {
-            document.getElementById('info-title').innerText = name;
-            document.getElementById('info-img').src = details.img;
-            document.getElementById('info-text').innerText = details.text;
-            document.getElementById('info-box').style.display = 'block';
-
-            map.flyTo(newLatLng, 16, {
-              animate: true,
-              duration: 1.5
-            });
-          });
-
+          marker.on('click', () => showInfo(name, details, newLatLng));
           return marker;
         }
       }).addTo(map);
     });
 
-    // أزرار تحريك الخريطة
-    function panLeft() {
-      map.panBy([-150, 0]);
+    // ===================== Ramallah Projects =====================
+    $.getJSON("LocationRamallah.json", function(RP) {
+      const redIcon = L.icon({
+        iconUrl: 'red.png',
+        iconSize: [25, 32],
+        iconAnchor: [10, 32],
+        popupAnchor: [1, -34],
+      });
+
+      const ramallahDetails = {
+        "Ramallah Water Authority Lab": {
+          img: "labRamallah.png",
+          text: "The Water Authority Lab in Ramallah conducts water quality analysis and supports water governance..."
+        },
+        "Sector Reform": {
+          img: "reform.png",
+          text: "The Sector Reform project improves institutional and regulatory frameworks for the water sector in Palestine..."
+        }
+      };
+
+      const addedCoords = [];
+
+      L.geoJson(RP, {
+        pointToLayer: function(feature, latlng) {
+          const name = feature.properties.Name.trim();
+          const details = ramallahDetails[name] || { img: "default.jpg", text: "No details available." };
+
+          let newLatLng = latlng;
+          const offset = 0.0003;
+          while (addedCoords.some(coord => newLatLng.distanceTo(coord) < 10)) {
+            newLatLng = L.latLng(newLatLng.lat + offset, newLatLng.lng + offset);
+          }
+          addedCoords.push(newLatLng);
+
+          const marker = L.marker(newLatLng, { icon: redIcon }).bindPopup(name);
+          marker.on('click', () => showInfo(name, details, newLatLng));
+          return marker;
+        }
+      }).addTo(map);
+    });
+
+    // ===================== Info Display =====================
+    function showInfo(name, details, latlng) {
+      document.getElementById('info-title').innerText = name;
+      document.getElementById('info-img').src = details.img;
+      document.getElementById('info-text').innerText = details.text;
+      document.getElementById('info-box').style.display = 'block';
+
+      map.flyTo(latlng, 16, { animate: true, duration: 1.5 });
     }
 
-    function panRight() {
-      map.panBy([150, 0]);
-    }
-
-    document.getElementById('left-button').addEventListener('click', panLeft);
-    document.getElementById('right-button').addEventListener('click', panRight);
-
-    // زر إغلاق صندوق المعلومات
-    document.getElementById('close-btn').addEventListener('click', function () {
+    document.getElementById('left-button').addEventListener('click', () => map.panBy([-150, 0]));
+    document.getElementById('right-button').addEventListener('click', () => map.panBy([150, 0]));
+    document.getElementById('close-btn').addEventListener('click', () => {
       document.getElementById('info-box').style.display = 'none';
     });
   </script>
