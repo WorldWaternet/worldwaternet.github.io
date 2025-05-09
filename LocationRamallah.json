@@ -1,0 +1,4 @@
+{
+  "type" : "FeatureCollection",
+  "features" : [{"type":"Feature","id":1,"geometry":{"type":"Point","coordinates":[35.205709207647715,31.918116646367668]},"properties":{"OBJECTID":1,"Name":" Ramallah Water Authority Lab ","Location":"Ramallah"}},{"type":"Feature","id":2,"geometry":{"type":"Point","coordinates":[35.205627843108211,31.918240219419449]},"properties":{"OBJECTID":2,"Name":"Sector Reform","Location":"Ramallah"}}]
+}
