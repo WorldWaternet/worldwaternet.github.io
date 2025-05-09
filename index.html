@@ -105,15 +105,15 @@
       map.fitBounds(goverLayer.getBounds());
     });
 
+    const blueIcon = L.icon({
+      iconUrl: 'blue.png',
+      iconSize: [25, 32],
+      iconAnchor: [10, 32],
+      popupAnchor: [1, -34],
+    });
+
     // ===================== Salfit Projects =====================
     $.getJSON("SalfitProject.json", function(SP) {
-      const blueIcon = L.icon({
-        iconUrl: 'blue.png',
-        iconSize: [25, 32],
-        iconAnchor: [10, 32],
-        popupAnchor: [1, -34],
-      });
-
       const siteDetails = {
         "BluElephant": {
           img: "BluElephant.png",
@@ -164,19 +164,12 @@
 
     // ===================== Ramallah Projects =====================
     $.getJSON("LocationRamallah.json", function(RP) {
-      const redIcon = L.icon({
-        iconUrl: 'blue.png',
-        iconSize: [25, 32],
-        iconAnchor: [10, 32],
-        popupAnchor: [1, -34],
-      });
-
       const ramallahDetails = {
         "Ramallah Water Authority Lab": {
           img: "labRamallah.png",
-          text: "Review the existing SOPs and add new SOPs based on the needs
-            Training on sampling and analysis in the Netherlands
-              Regularly meetings with the experts."
+          text: `Review the existing SOPs and add new SOPs based on the needs.
+Training on sampling and analysis in the Netherlands.
+Regular meetings with the experts.`
         },
         "Sector Reform": {
           img: "reform.png",
@@ -198,7 +191,7 @@
           }
           addedCoords.push(newLatLng);
 
-          const marker = L.marker(newLatLng, { icon: redIcon }).bindPopup(name);
+          const marker = L.marker(newLatLng, { icon: blueIcon }).bindPopup(name);
           marker.on('click', () => showInfo(name, details, newLatLng));
           return marker;
         }
